@@ -22,3 +22,6 @@ build/
 *~
 lib/
 
+rgbd_dataset_freiburg1_room
+
+build*
