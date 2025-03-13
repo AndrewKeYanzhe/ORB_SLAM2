@@ -9,7 +9,7 @@
 # 35.6mm x 23.8mm sensor
 # 6000*4000 full resolution
 # 29mm focal length for 20mm lens: effective sensor size is 35.6/29*20 = 24.55mm wide
-# focal length in pixels = 1280*29/24.55 = 1512
+# focal length in pixels = 1280*20/24.55 = 1043
 
 # plan to use 1280*720 images
 Camera.fx: 1512
