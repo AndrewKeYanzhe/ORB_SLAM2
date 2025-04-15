@@ -5,20 +5,34 @@
 #--------------------------------------------------------------------------------------------
 
 # Camera calibration and distortion parameters (OpenCV) 
-# video resolution is 640*480
-Camera.fx: 517.306408
-Camera.fy: 516.469215
-Camera.cx: 318.643040
-Camera.cy: 255.313989
+# fx and fy are focal length, expressed in pixels
 
-Camera.k1: 0.262383
-Camera.k2: -0.953104
-Camera.p1: -0.005358
-Camera.p2: 0.002628
-Camera.k3: 1.163314
+# 640*360
+
+Camera.fx: 537.112263
+Camera.fy: 538.252762
+Camera.cx: 322.192935
+Camera.cy: 179.645197
+
+Camera.k1: -0.043726
+Camera.k2: 0.095046
+Camera.p1: -0.001644
+Camera.p2: 0.001387
+Camera.k3: -0.329529
+
+# Camera.fx: 517.306408
+# Camera.fy: 516.469215
+# Camera.cx: 318.643040
+# Camera.cy: 255.313989
+
+# Camera.k1: 0.262383
+# Camera.k2: -0.953104
+# Camera.p1: -0.005358
+# Camera.p2: 0.002628
+# Camera.k3: 1.163314
 
 # Camera frames per second 
-Camera.fps: 30.0
+Camera.fps: 29.97
 
 # Color order of the images (0: BGR, 1: RGB. It is ignored if images are grayscale)
 Camera.RGB: 1
@@ -28,7 +42,7 @@ Camera.RGB: 1
 #--------------------------------------------------------------------------------------------
 
 # ORB Extractor: Number of features per image
-ORBextractor.nFeatures: 1000
+ORBextractor.nFeatures: 4000
 
 # ORB Extractor: Scale factor between levels in the scale pyramid 	
 ORBextractor.scaleFactor: 1.2
@@ -40,6 +54,7 @@ ORBextractor.nLevels: 8
 # Image is divided in a grid. At each cell FAST are extracted imposing a minimum response.
 # Firstly we impose iniThFAST. If no corners are detected we impose a lower value minThFAST
 # You can lower these values if your images have low contrast			
+# cant be decimal
 ORBextractor.iniThFAST: 20
 ORBextractor.minThFAST: 7
 
