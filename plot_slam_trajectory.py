@@ -29,10 +29,10 @@ def plot_3d_trajectory(file_path):
     ax.set_xlabel("X")
     ax.set_ylabel("Y")
     ax.set_zlabel("Z")
-    ax.set_title("3D Trajectory")
+    ax.set_title("3D SLAM Trajectory")
     # ax.legend()
     # plt.show()
-    plt.savefig('3d_plot.pdf')
+    plt.savefig('3d_plot_slam.pdf')
 
 def plot_2d_trajectory(file_path):
     """Plots the 2D trajectory using x, y coordinates."""
@@ -49,7 +49,7 @@ def plot_2d_trajectory(file_path):
     
     plt.xlabel("X")
     plt.ylabel("Y")
-    plt.title("2D Trajectory (XY Plane)")
+    plt.title("2D SLAM Trajectory (XY Plane)")
     
     # # Set axis limits to ensure square scaling
     # x_min, x_max = min(x), max(x)
@@ -64,7 +64,7 @@ def plot_2d_trajectory(file_path):
     # 'box': Adjusts the box size of the plot area (the figure area stays fixed).
     # 'datalim': Would adjust the data limits instead.
     plt.tight_layout()
-    plt.savefig('2d_plot.pdf')
+    plt.savefig('2d_plot_slam.pdf')
     plt.show()
 
 if __name__ == "__main__":
