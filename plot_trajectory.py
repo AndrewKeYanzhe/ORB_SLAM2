@@ -38,7 +38,8 @@ def plot_2d_trajectory(file_path):
     """Plots the 2D trajectory using x, y coordinates."""
     x, y, _ = read_trajectory(file_path)
     
-    plt.figure()
+    # plt.figure(figsize=(4.5, 2.5))  # Set figure size for a two-column paper
+    plt.figure(figsize=(4.5, 4.5))  # Set figure size for a two-column paper
     
     # Create a colormap that transitions from green to red
     colors = plt.cm.Blues(np.linspace(0.2, 1, len(x)))
@@ -49,11 +50,25 @@ def plot_2d_trajectory(file_path):
     plt.xlabel("X")
     plt.ylabel("Y")
     plt.title("2D Trajectory (XY Plane)")
-    # plt.legend()
+    
+    # # Set axis limits to ensure square scaling
+    # x_min, x_max = min(x), max(x)
+    # y_min, y_max = min(y), max(y)
+    # axis_min = min(x_min, y_min)
+    # axis_max = max(x_max, y_max)
+    # plt.xlim(axis_min, axis_max)
+    # plt.ylim(axis_min, axis_max)
+    
     plt.axis("equal")  # Ensure equal scaling
-    # plt.show()
+    plt.gca().set_aspect('equal', adjustable='datalim')  # Ensure square chart area
+    # 'box': Adjusts the box size of the plot area (the figure area stays fixed).
+    # 'datalim': Would adjust the data limits instead.
+    plt.tight_layout()
     plt.savefig('2d_plot.pdf')
 
 
-plot_3d_trajectory("KeyFrameTrajectory_360p_sdr_4000orb.txt")
-plot_2d_trajectory("KeyFrameTrajectory_360p_sdr_4000orb.txt")
+trajectory_path = "KeyFrameTrajectory_sdr_4000orb.txt"
+# trajectory_path = "KeyFrameTrajectory_pq_4000orb.txt"
+
+plot_3d_trajectory(trajectory_path)
+plot_2d_trajectory(trajectory_path)
