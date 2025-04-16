@@ -8,14 +8,14 @@ import numpy as np
 # matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
-def read_trajectory(file_path):
-    """Reads trajectory data from the file and returns numpy arrays for x, y, z."""
-    data = np.loadtxt(file_path, comments='#', usecols=(1, 2, 3))
-    return data[:, 0], data[:, 1], data[:, 2]
+def read_slam_trajectory(file_path):
+    """Reads trajectory data from the file and returns numpy arrays for timestamp, x, y, z."""
+    data = np.loadtxt(file_path, comments='#', usecols=(0, 1, 2, 3))  # Include the timestamp column
+    return data[:, 0], data[:, 1], data[:, 2], data[:, 3]  # Return timestamp, x, y, z
 
 def plot_3d_trajectory(file_path):
     """Plots the 3D trajectory using x, y, z coordinates."""
-    x, y, z = read_trajectory(file_path)
+    _, x, y, z = read_slam_trajectory(file_path)
     
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
@@ -36,7 +36,7 @@ def plot_3d_trajectory(file_path):
 
 def plot_2d_trajectory(file_path):
     """Plots the 2D trajectory using x, y coordinates."""
-    x, y, _ = read_trajectory(file_path)
+    _, x, y, _ = read_slam_trajectory(file_path)
     
     # plt.figure(figsize=(4.5, 2.5))  # Set figure size for a two-column paper
     plt.figure(figsize=(4.5, 4.5))  # Set figure size for a two-column paper
@@ -65,10 +65,13 @@ def plot_2d_trajectory(file_path):
     # 'datalim': Would adjust the data limits instead.
     plt.tight_layout()
     plt.savefig('2d_plot.pdf')
+    plt.show()
 
+if __name__ == "__main__":
+    # Example usage
 
-trajectory_path = "KeyFrameTrajectory_sdr_4000orb.txt"
-# trajectory_path = "KeyFrameTrajectory_pq_4000orb.txt"
+    # trajectory_path = "KeyFrameTrajectory_sdr_4000orb.txt"
+    trajectory_path = "KeyFrameTrajectory_pq_4000orb.txt"
 
-plot_3d_trajectory(trajectory_path)
-plot_2d_trajectory(trajectory_path)
+    # plot_3d_trajectory(trajectory_path)
+    plot_2d_trajectory(trajectory_path)
