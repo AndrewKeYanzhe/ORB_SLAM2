@@ -28,3 +28,4 @@ build*
 
 .venv/
 Examples/Monocular/mono_tum_og_backup
+gps_path_map.html
