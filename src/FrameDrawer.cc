@@ -26,6 +26,10 @@
 
 #include<mutex>
 
+#include <fstream>      // for CSV logging
+#include <sstream>      // for stringstream
+
+
 namespace ORB_SLAM2
 {
 
@@ -33,6 +37,8 @@ FrameDrawer::FrameDrawer(Map* pMap):mpMap(pMap)
 {
     mState=Tracking::SYSTEM_NOT_READY;
     mIm = cv::Mat(480,640,CV_8UC3, cv::Scalar(0,0,0));
+    mFrameId = 0; // initialize frame ID
+
 }
 
 cv::Mat FrameDrawer::DrawFrame()
@@ -129,6 +135,10 @@ cv::Mat FrameDrawer::DrawFrame()
 void FrameDrawer::DrawTextInfo(cv::Mat &im, int nState, cv::Mat &imText)
 {
     stringstream s;
+    int nKFs = 0;
+    int nMPs = 0;
+    int N = mvCurrentKeys.size();
+
     if(nState==Tracking::NO_IMAGES_YET)
         s << " WAITING FOR IMAGES";
     else if(nState==Tracking::NOT_INITIALIZED)
@@ -139,8 +149,8 @@ void FrameDrawer::DrawTextInfo(cv::Mat &im, int nState, cv::Mat &imText)
             s << "SLAM MODE |  ";
         else
             s << "LOCALIZATION | ";
-        int nKFs = mpMap->KeyFramesInMap();
-        int nMPs = mpMap->MapPointsInMap();
+        nKFs = mpMap->KeyFramesInMap();
+        nMPs = mpMap->MapPointsInMap();
         s << "KFs: " << nKFs << ", MPs: " << nMPs << ", Matches: " << mnTracked;
         if(mnTrackedVO>0)
             s << ", + VO matches: " << mnTrackedVO;
@@ -154,14 +164,31 @@ void FrameDrawer::DrawTextInfo(cv::Mat &im, int nState, cv::Mat &imText)
         s << " LOADING ORB VOCABULARY. PLEASE WAIT...";
     }
 
+    // === CSV LOGGING ===
+    std::string filename = "slam_stats.csv";
+    std::ifstream infile(filename);
+    bool file_exists = infile.good();
+    infile.close();
+
+    std::ofstream logfile(filename, std::ios::app);
+    if (logfile.is_open())
+    {
+        if (!file_exists)
+        {
+            logfile << "frame_id,state,num_keyframes,num_mappoints,mnTracked,mnTrackedVO,num_orb_features\n";
+        }
+
+        logfile << mFrameId << "," << nState << "," << nKFs << "," << nMPs << "," << mnTracked << "," << mnTrackedVO << "," << N << "\n";
+        logfile.close();
+    }
+
+    // === Draw info text on image ===
     int baseline=0;
     cv::Size textSize = cv::getTextSize(s.str(),cv::FONT_HERSHEY_PLAIN,1,1,&baseline);
-
     imText = cv::Mat(im.rows+textSize.height+10,im.cols,im.type());
     im.copyTo(imText.rowRange(0,im.rows).colRange(0,im.cols));
     imText.rowRange(im.rows,imText.rows) = cv::Mat::zeros(textSize.height+10,im.cols,im.type());
     cv::putText(imText,s.str(),cv::Point(5,imText.rows-5),cv::FONT_HERSHEY_PLAIN,1,cv::Scalar(255,255,255),1,8);
-
 }
 
 void FrameDrawer::Update(Tracking *pTracker)
@@ -197,6 +224,8 @@ void FrameDrawer::Update(Tracking *pTracker)
             }
         }
     }
+    mFrameId = pTracker->mCurrentFrame.mnId;  // get frame ID from tracker
+
     mState=static_cast<int>(pTracker->mLastProcessedState);
 }
 

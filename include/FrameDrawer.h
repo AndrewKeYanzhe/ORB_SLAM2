@@ -66,6 +66,8 @@ protected:
     Map* mpMap;
 
     std::mutex mMutex;
+private:
+    unsigned int mFrameId;  // ← Add this line
 };
 
 } //namespace ORB_SLAM
