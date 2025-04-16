@@ -22,11 +22,14 @@ start_time== (start_time // 1000) * 1000
 
 from pyproj import Proj, transform
 
-def plot_trajectory_matplotlib():
+def read_gps_and_plot(show_plot=True):
+    """Reads GPS data from the file and plots the trajectory in meters (x, y) with the first point as the origin."""
     """Plots the trajectory in meters (x, y) instead of latitude and longitude, with the first point as the origin."""
+    '''return x_coords, y_coords, unix_times in seconds'''
     # Lists to store extracted coordinates
     latitudes = []
     longitudes = []
+    unix_times = []  # List to store corresponding unix_time_millis
 
     # Read and extract data from the file
     with open(gnss_log_file, "r") as file:
@@ -39,6 +42,7 @@ def plot_trajectory_matplotlib():
                 if unix_time_millis >= start_time:
                     latitudes.append(float(match.group(1)))
                     longitudes.append(float(match.group(2)))
+                    unix_times.append(unix_time_millis/1000)  # Append the unix_time_millis
 
     # Convert latitude and longitude to x, y in meters
     if latitudes and longitudes:
@@ -53,19 +57,25 @@ def plot_trajectory_matplotlib():
         x_coords = [x - x_origin for x in x_coords]
         y_coords = [y - y_origin for y in y_coords]
 
-        # Plot the GPS coordinates in meters
-        plt.figure(figsize=(4.5, 4.5))
-        plt.plot(x_coords, y_coords, marker='o', linestyle='-', color='b', label="GPS Path")
-        plt.xlabel("X (meters)")
-        plt.ylabel("Y (meters)")
-        plt.title("GNSS GPS Coordinates in Meters (Origin at First Point)")
-        plt.axis("equal")  # Ensure equal scaling
-        plt.gca().set_aspect('equal', adjustable='datalim')  # Ensure 
-        plt.legend()
-        plt.grid()
-        plt.show()
+        if show_plot:
+            # Plot the GPS coordinates in meters
+            plt.figure(figsize=(4.5, 4.5))
+            plt.plot(x_coords, y_coords, marker='o', markersize=1, linestyle='-', color='b', label="GPS Path")  # Reduced marker size
+
+            plt.xlabel("X (meters)")
+            plt.ylabel("Y (meters)")
+            plt.title("GPS Coordinates (Origin at First Point)")
+            plt.axis("equal")  # Ensure equal scaling
+            plt.gca().set_aspect('equal', adjustable='datalim')  # Ensure 
+            plt.legend()
+            plt.grid()
+            plt.savefig('gps_path_plot.pdf')
+            plt.show()
     else:
         print("No valid GPS coordinates found.")
+
+    
+    return x_coords, y_coords, unix_times
 
 
 
@@ -107,5 +117,10 @@ def plot_trajectory_on_html_map():
         print("No valid GPS coordinates found.")
 
 
-plot_trajectory_on_html_map()
-plot_trajectory_matplotlib()
+
+
+
+
+if __name__ == "__main__":
+    plot_trajectory_on_html_map()
+    read_gps_and_plot()
