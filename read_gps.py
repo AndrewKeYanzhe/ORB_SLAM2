@@ -67,6 +67,7 @@ def read_gps_and_plot(show_plot=True):
             plt.title("GPS Coordinates (Origin at First Point)")
             plt.axis("equal")  # Ensure equal scaling
             plt.gca().set_aspect('equal', adjustable='datalim')  # Ensure 
+            plt.tight_layout()  # Adjust layout to fit the figure
             plt.legend()
             plt.grid()
             plt.savefig('gps_path_plot.pdf')
