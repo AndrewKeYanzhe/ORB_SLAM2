@@ -59,7 +59,7 @@ print('length of slam_x:', len(slam_x))
 
 
 
-def horn_alignment(slam_points, gps_points):
+def similarity_alignment(slam_points, gps_points):
     """
     Aligns SLAM points to GPS points using Horn's method. by copilot
     Horn alignment doesnt have scale.
@@ -129,7 +129,7 @@ slam_points = np.column_stack((slam_x, slam_y))
 gps_points = np.column_stack((gps_x, gps_y))
 
 # Align SLAM points to GPS points using Horn's method
-aligned_slam_points, transformation_matrix = horn_alignment(slam_points, gps_points)
+aligned_slam_points, transformation_matrix = similarity_alignment(slam_points, gps_points)
 
 # Extract aligned SLAM x and y coordinates
 aligned_slam_x, aligned_slam_y = aligned_slam_points[:, 0], aligned_slam_points[:, 1]
