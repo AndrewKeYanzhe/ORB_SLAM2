@@ -34,35 +34,41 @@ def plot_3d_trajectory(file_path):
     # plt.show()
     plt.savefig('3d_plot_slam.pdf')
 
-def plot_2d_trajectory(file_path):
+def plot_2d_trajectory(x,y, title1 = None, x2=None, y2=None, title2=None):
     """Plots the 2D trajectory using x, y coordinates."""
-    _, x, y, _ = read_slam_trajectory(file_path)
+    
     
     # plt.figure(figsize=(4.5, 2.5))  # Set figure size for a two-column paper
     plt.figure(figsize=(4.5, 4.5))  # Set figure size for a two-column paper
     
     # Create a colormap that transitions from green to red
     colors = plt.cm.Blues(np.linspace(0.2, 1, len(x)))
+    colors2 = plt.cm.Reds(np.linspace(0.2, 1, len(x)))
     
     for i in range(len(x) - 1):
-        plt.plot(x[i:i+2], y[i:i+2], color=colors[i])
+        if i == len(x) // 2:
+            plt.plot(x[i:i+2], y[i:i+2], color=colors[i], label=title1)
+        else:
+            plt.plot(x[i:i+2], y[i:i+2], color=colors[i])
+    
+    if x2 is not None and y2 is not None:
+        for i in range(len(x2) - 1):
+            if i == len(x2) //2:
+                plt.plot(x2[i:i+2], y2[i:i+2], color=colors2[i], label=title2)
+            else:
+                plt.plot(x2[i:i+2], y2[i:i+2], color=colors2[i])
     
     plt.xlabel("X")
     plt.ylabel("Y")
     plt.title("2D SLAM Trajectory (XY Plane)")
     
-    # # Set axis limits to ensure square scaling
-    # x_min, x_max = min(x), max(x)
-    # y_min, y_max = min(y), max(y)
-    # axis_min = min(x_min, y_min)
-    # axis_max = max(x_max, y_max)
-    # plt.xlim(axis_min, axis_max)
-    # plt.ylim(axis_min, axis_max)
+
     
     plt.axis("equal")  # Ensure equal scaling
     plt.gca().set_aspect('equal', adjustable='datalim')  # Ensure square chart area
     # 'box': Adjusts the box size of the plot area (the figure area stays fixed).
     # 'datalim': Would adjust the data limits instead.
+    plt.legend()
     plt.tight_layout()
     plt.savefig('2d_plot_slam.pdf')
     plt.show()
@@ -74,4 +80,6 @@ if __name__ == "__main__":
     trajectory_path = "KeyFrameTrajectory_pq_4000orb.txt"
 
     # plot_3d_trajectory(trajectory_path)
-    plot_2d_trajectory(trajectory_path)
+
+    _, x, y, _ = read_slam_trajectory(trajectory_path)
+    plot_2d_trajectory(x,y)
