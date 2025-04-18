@@ -34,7 +34,7 @@ def plot_3d_trajectory(file_path):
     # plt.show()
     plt.savefig('3d_plot_slam.pdf')
 
-def plot_2d_trajectory(x,y, title1 = None, x2=None, y2=None, title2=None):
+def plot_2d_trajectory(x,y, title1 = None, x2=None, y2=None, title2=None, experiment_name=""):
     """Plots the 2D trajectory using x, y coordinates."""
     
     
@@ -57,10 +57,14 @@ def plot_2d_trajectory(x,y, title1 = None, x2=None, y2=None, title2=None):
                 plt.plot(x2[i:i+2], y2[i:i+2], color=colors2[i], label=title2)
             else:
                 plt.plot(x2[i:i+2], y2[i:i+2], color=colors2[i])
+
     
-    plt.xlabel("X")
-    plt.ylabel("Y")
-    plt.title("2D SLAM Trajectory (XY Plane)")
+    plt.xlabel("X (m)")
+    plt.ylabel("Y (m)")
+    if experiment_name != "":
+        plt.title(f"2D SLAM Trajectory ({experiment_name})")
+    else:
+        plt.title(f"2D SLAM Trajectory")
     
 
     
@@ -70,7 +74,10 @@ def plot_2d_trajectory(x,y, title1 = None, x2=None, y2=None, title2=None):
     # 'datalim': Would adjust the data limits instead.
     plt.legend()
     plt.tight_layout()
-    plt.savefig('2d_plot_slam.pdf')
+    if experiment_name != "":
+        plt.savefig(f'2d_plot_slam_{experiment_name}.pdf')
+    else:
+        plt.savefig(f'2d_plot_slam.pdf')
     plt.show()
 
 if __name__ == "__main__":

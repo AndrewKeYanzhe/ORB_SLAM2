@@ -25,8 +25,24 @@ print('\ntest gps data')
 print(gps_time[index],gps_x[index],gps_y[index])
 
 
-slam_file_path = 'KeyFrameTrajectory_pq_4000orb.txt'
-slam_file_path = 'KeyFrameTrajectory_hdr_log_V4_ThFast3_3_complete.txt'
+# slam_file_path = 'KeyFrameTrajectory_pq_4000orb.txt'
+# slam_file_path = 'KeyFrameTrajectory_hdr_log_V4_ThFast3_3_complete.txt'
+
+# slam_file_path = 'KeyFrameTrajectory_sdr_log_V2_complete.txt'
+# slam_file_path = 'KeyFrameTrajectory_sdr_log_V3_ThFast3_3_complete.txt'
+
+import re
+
+# slam_file_path = 'KeyFrameTrajectory_sdr_V2_timeCorrected.txt'
+# slam_file_path = 'KeyFrameTrajectory_pq_V2_ThFast3_3.txt'
+# slam_file_path = 'KeyFrameTrajectory_hdr_log_V4_ThFast3_3_complete.txt'
+slam_file_path = 'KeyFrameTrajectory_sdr_log_V3_ThFast3_3_complete.txt'
+
+match = re.search(r'KeyFrameTrajectory_(.*?)_V', slam_file_path)
+if match:
+    experiment_name = match.group(1)
+    print('experiment name',experiment_name)  # Output: sdr
+
 
 # about 3 keyframes per second
 slam_time, slam_x_og, slam_y_og, slam_z_og = read_slam_trajectory(slam_file_path)
@@ -87,6 +103,8 @@ def similarity_alignment(slam_points, gps_points):
     5. Compute the rotation matrix using the SVD result  
     6. Compute the scale factor (optional)  
     7. Compute the translation vector  
+
+    # this seems to do uniform scaling.
 
     
 
@@ -188,7 +206,7 @@ errors, rmse = calculate_ate(gps_x, gps_y, aligned_slam_x, aligned_slam_y)
 # print("Absolute Trajectory Error (ATE) at each step:", errors)
 print("Root Mean Squared Error (RMSE):", rmse)
 
-def plot_list(data, title='List Plot', xlabel='Index', ylabel='Value'):
+def plot_list(data, title='List Plot', xlabel='Index', ylabel='Value', experiment_name=""):
     plt.figure(figsize=(4.5, 4.5))
     plt.plot(data, marker='o', markersize=2)
     plt.title('Plot of the List')
@@ -197,12 +215,18 @@ def plot_list(data, title='List Plot', xlabel='Index', ylabel='Value'):
     plt.title(title)
     plt.grid(True)
     plt.tight_layout()
+    if experiment_name != "":
+        plt.savefig(f'{title} {experiment_name}.pdf')
+    else:
+        plt.savefig(f'{title}.pdf')
     plt.show()
 
-plot_list(errors, title='Absolute trajectory error (ATE)', xlabel='Time (s)', ylabel='ATE (m)')
+plot_2d_trajectory(gps_x, gps_y, title1='GPS', x2=aligned_slam_x, y2=aligned_slam_y, title2='SLAM', experiment_name=experiment_name)
+
+plot_list(errors, title=f'Absolute trajectory error ({experiment_name})', xlabel='Time (s)', ylabel='Absolute trajectory error (m)')
 
 
-plot_2d_trajectory(gps_x, gps_y, title1='GPS', x2=aligned_slam_x, y2=aligned_slam_y, title2='SLAM')
+
 
 import numpy as np
 
@@ -250,4 +274,4 @@ rpe_list, rmse_rpe = compute_rpe_rmse(gps_x, gps_y, aligned_slam_x, aligned_slam
 print("Root Mean Squared Error (RMSE) of RPE:", rmse_rpe)
 
 # Plot RPE
-plot_list(rpe_list, title='Relative Pose Error (RPE)', xlabel='Index', ylabel='RPE (m)')
+plot_list(rpe_list, title=f'Relative Pose Error ({experiment_name})', xlabel='Index', ylabel='Relative Pose Error (m)')
