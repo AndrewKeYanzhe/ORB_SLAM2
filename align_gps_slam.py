@@ -2,6 +2,8 @@ from read_gps import read_gps_and_plot
 from plot_slam_trajectory import read_slam_trajectory, plot_2d_trajectory
 import numpy as np
 
+import matplotlib.pyplot as plt
+
 # 1 sample per second
 gps_x, gps_y, gps_time = read_gps_and_plot(show_plot=False)
 
@@ -13,8 +15,12 @@ print('\n index:',index)
 print('\ntest gps data')
 print(gps_time[index],gps_x[index],gps_y[index])
 
+
+slam_file_path = 'KeyFrameTrajectory_pq_4000orb.txt'
+slam_file_path = 'KeyFrameTrajectory_hdr_log_V4_ThFast3_3_complete.txt'
+
 # about 3 keyframes per second
-slam_time, slam_x_og, slam_y_og, slam_z_og = read_slam_trajectory("KeyFrameTrajectory_pq_4000orb.txt")
+slam_time, slam_x_og, slam_y_og, slam_z_og = read_slam_trajectory(slam_file_path)
 
 print('\ntest slam data')
 print(slam_time[index],slam_x_og[index],slam_y_og[index],slam_z_og[index])
@@ -139,4 +145,52 @@ print("Horn's Method Transformation Matrix:")
 print(transformation_matrix)
 
 # Plot the aligned trajectories
+
+def calculate_ate(gps_x, gps_y, aligned_slam_x, aligned_slam_y):
+    """
+    Calculate the Absolute Trajectory Error (ATE) and RMSE between GPS and aligned SLAM trajectories.
+
+    Args:
+        gps_x: List or numpy array of GPS x-coordinates.
+        gps_y: List or numpy array of GPS y-coordinates.
+        aligned_slam_x: List or numpy array of aligned SLAM x-coordinates.
+        aligned_slam_y: List or numpy array of aligned SLAM y-coordinates.
+
+    Returns:
+        errors: List of ATE values at each step.
+        rmse: Root Mean Squared Error of the ATE.
+    """
+    # Ensure inputs are numpy arrays
+    gps_points = np.column_stack((gps_x, gps_y))
+    aligned_slam_points = np.column_stack((aligned_slam_x, aligned_slam_y))
+
+    # Compute the Euclidean distance (ATE) at each step
+    errors = np.linalg.norm(gps_points - aligned_slam_points, axis=1)
+
+    # Compute the RMSE
+    rmse = np.sqrt(np.mean(errors ** 2))
+
+    return errors.tolist(), rmse
+
+# Calculate ATE and RMSE
+errors, rmse = calculate_ate(gps_x, gps_y, aligned_slam_x, aligned_slam_y)
+
+# Print the results
+# print("Absolute Trajectory Error (ATE) at each step:", errors)
+print("Root Mean Squared Error (RMSE):", rmse)
+
+def plot_list(data, title='List Plot', xlabel='Index', ylabel='Value'):
+    plt.figure(figsize=(4.5, 4.5))
+    plt.plot(data, marker='o', markersize=2)
+    plt.title('Plot of the List')
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(title)
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+
+plot_list(errors, title='Absolute trajectory error (ATE)', xlabel='Time (s)', ylabel='ATE (m)')
+
+
 plot_2d_trajectory(gps_x, gps_y, title1='GPS', x2=aligned_slam_x, y2=aligned_slam_y, title2='SLAM')
