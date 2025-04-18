@@ -9,26 +9,78 @@
 # 7,1,0,0,0,0,7522
 # 7,1,0,0,0,0,7522
 # 7,1,0,0,0,0,7522
-# 7,1,0,0,0,0,7522
-# 7,1,0,0,0,0,7522
-# 8,1,0,0,0,0,7525
-# 8,1,0,0,0,0,7525
-# 8,1,0,0,0,0,7525
-# 8,1,0,0,0,0,7525
+
+
+# SYSTEM_NOT_READY=-1,
+# NO_IMAGES_YET=0,
+# NOT_INITIALIZED=1,
+# OK=2,
+# LOST=3
+
+# quirk in my data logging code: when ORBSLAM2 is restarted, it will continue appending to the csv file
+
+
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
+
+
+# csv_1 = 'slam_stats_sdr_log_V1_lost_incomplete.csv'
+csv_1 = 'slam_stats_hdr_log_4000orb_lost_complete.csv'
+csv_2 = 'slam_stats_sdr_log_V2_complete.csv'
+
+
+def check_frame_id_decrements(data):
+    """
+    Checks for decreases in the 'frame_id' column of the given DataFrame.
+    Prints a warning if any decrement is found and a message if no decrements occur.
+    
+    Parameters:
+    data (pd.DataFrame): The DataFrame to check.
+    """
+    decrement_warning = False
+
+    for i in range(1, len(data)):
+        if data.iloc[i]["frame_id"] < data.iloc[i - 1]["frame_id"]:
+            print(f"Warning: frame_id decreased from {data.iloc[i - 1]['frame_id']} to {data.iloc[i]['frame_id']} at index {i}.")
+            decrement_warning = True
+
+    if not decrement_warning:
+        print("No decrement in 'frame_id' for the entire DataFrame.")
 
 # Load the CSV files and skip repeated lines
-pq_data = pd.read_csv("slam_stats_pq_4000orb.csv", header=0, names=["frame_id", "state", "num_keyframes", "num_mappoints", "mnTracked", "mnTrackedVO", "num_orb_features"])
-sdr_data = pd.read_csv("slam_stats_sdr_4000orb.csv", header=0, names=["frame_id", "state", "num_keyframes", "num_mappoints", "mnTracked", "mnTrackedVO", "num_orb_features"])
+# pq_data = pd.read_csv("slam_stats_pq_4000orb.csv", header=0, names=["frame_id", "state", "num_keyframes", "num_mappoints", "mnTracked", "mnTrackedVO", "num_orb_features"])
+# sdr_data = pd.read_csv("slam_stats_sdr_4000orb.csv", header=0, names=["frame_id", "state", "num_keyframes", "num_mappoints", "mnTracked", "mnTrackedVO", "num_orb_features"])
+# Define the data types for each column
+data_types = {
+    "frame_id": int,
+    "state": int,
+    "num_keyframes": int,
+    "num_mappoints": int,
+    "mnTracked": int,
+    "mnTrackedVO": int,
+    "num_orb_features": int,
+}
 
-# Convert all columns to integer type
-pq_data = pq_data.astype(int)
-sdr_data = sdr_data.astype(int)
+# Load the CSV files with specified data types
+pq_data = pd.read_csv(csv_1, header=0, names=data_types.keys(), dtype=data_types)
+sdr_data = pd.read_csv(csv_2, header=0, names=data_types.keys(), dtype=data_types)
 
 # Drop duplicate rows
 pq_data = pq_data.drop_duplicates()
 sdr_data = sdr_data.drop_duplicates()
+
+print('pq_data')
+check_frame_id_decrements(pq_data)
+print('sdr_data')
+check_frame_id_decrements(sdr_data)
+
+
+# clean up data. otherwise mntracked always uses previous row's value if tracking is lost
+pq_data.loc[pq_data["state"] == 3, "mnTracked"] = np.nan
+sdr_data.loc[sdr_data["state"] == 3, "mnTracked"] = np.nan
+
+
 
 # Subsample the data to 100 points for each trend
 # pq_data = pq_data.iloc[::max(1, len(pq_data) // 100)]
@@ -41,19 +93,21 @@ pq_mnTracked = pq_data["mnTracked"]
 sdr_frame_id = sdr_data["frame_id"]
 sdr_mnTracked = sdr_data["mnTracked"]
 
-print(pq_data)
+# print(pq_data)
 # print(pq_data["frame_id"][0].dtypes)
 
 # Plot the data
 plt.figure(figsize=(10, 6))
-plt.plot(pq_frame_id, pq_mnTracked, label="PQ mnTracked", color="blue")
-plt.plot(sdr_frame_id, sdr_mnTracked, label="SDR mnTracked", color="red")
+plt.plot(pq_frame_id, pq_mnTracked, label=csv_1.split('slam_stats_')[1], color="blue")
+plt.plot(sdr_frame_id, sdr_mnTracked, label=csv_2.split('slam_stats_')[1], color="red")
 
 
 
 # Add labels, title, and legend
 plt.xlabel("Frame ID")
 plt.ylabel("mnTracked")
+plt.xlim(600, 750)
+plt.ylim(0,600)
 plt.title("mnTracked Trends for PQ and SDR (Subsampled)")
 plt.legend()
 plt.grid()

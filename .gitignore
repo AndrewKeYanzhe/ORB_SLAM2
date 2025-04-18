@@ -29,3 +29,5 @@ build*
 .venv/
 Examples/Monocular/mono_tum_og_backup
 gps_path_map.html
+mnTracked_trends_subsampled.pdf
+2d_plot_slam.pdf
