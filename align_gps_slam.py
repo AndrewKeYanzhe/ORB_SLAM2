@@ -194,3 +194,51 @@ plot_list(errors, title='Absolute trajectory error (ATE)', xlabel='Time (s)', yl
 
 
 plot_2d_trajectory(gps_x, gps_y, title1='GPS', x2=aligned_slam_x, y2=aligned_slam_y, title2='SLAM')
+
+import numpy as np
+
+def compute_rpe_rmse(gt_x, gt_y, data_x, data_y):
+    """
+    Compute RPE and RMSE of RPE from 2D ground truth and estimated trajectories.
+    
+    Inputs:
+        gt_x, gt_y   -- ground truth coordinates
+        data_x, data_y -- estimated coordinates
+    
+    Returns:
+        rpe_list     -- list of relative pose errors
+        rmse_rpe     -- RMSE of relative pose errors
+    """
+    # Convert inputs to numpy arrays
+    gt_x, gt_y = np.array(gt_x), np.array(gt_y)
+    data_x, data_y = np.array(data_x), np.array(data_y)
+
+    assert len(gt_x) == len(data_x), "Ground truth and data must be the same length"
+    N = len(gt_x)
+
+    rpe_list = []
+
+    for i in range(N - 1):
+        # Compute relative motion from i to i+1 for GT and estimate
+        gt_dx = gt_x[i + 1] - gt_x[i]
+        gt_dy = gt_y[i + 1] - gt_y[i]
+
+        data_dx = data_x[i + 1] - data_x[i]
+        data_dy = data_y[i + 1] - data_y[i]
+
+        # Compute error between relative motions
+        error = np.sqrt((gt_dx - data_dx)**2 + (gt_dy - data_dy)**2)
+        rpe_list.append(error)
+
+    # RMSE of RPE
+    rpe_array = np.array(rpe_list)
+    rmse_rpe = np.sqrt(np.mean(rpe_array**2))
+
+    return rpe_list, rmse_rpe
+
+rpe_list, rmse_rpe = compute_rpe_rmse(gps_x, gps_y, aligned_slam_x, aligned_slam_y)
+# print("Relative Pose Error (RPE) at each step:", rpe_list)
+print("Root Mean Squared Error (RMSE) of RPE:", rmse_rpe)
+
+# Plot RPE
+plot_list(rpe_list, title='Relative Pose Error (RPE)', xlabel='Index', ylabel='RPE (m)')
