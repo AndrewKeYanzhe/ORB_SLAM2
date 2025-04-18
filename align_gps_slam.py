@@ -2,6 +2,15 @@ from read_gps import read_gps_and_plot
 from plot_slam_trajectory import read_slam_trajectory, plot_2d_trajectory
 import numpy as np
 
+
+import matplotlib
+import platform
+
+if platform.system()=='Linux':
+    matplotlib.use('TkAgg')
+
+
+
 import matplotlib.pyplot as plt
 
 # 1 sample per second
