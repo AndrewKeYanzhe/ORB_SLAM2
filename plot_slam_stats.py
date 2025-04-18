@@ -26,8 +26,11 @@ import numpy as np
 
 
 # csv_1 = 'slam_stats_sdr_log_V1_lost_incomplete.csv'
-csv_1 = 'slam_stats_hdr_log_4000orb_lost_complete.csv'
-csv_2 = 'slam_stats_sdr_log_V2_complete.csv'
+csv_1 = 'slam_stats_hdr_log_V1_4000orb_lost_complete.csv'
+
+# this is a good comparison
+csv_1 = 'slam_stats_hdr_log_V2_lost_partial.csv'
+csv_2 = 'slam_stats_hdr_log_V3_ThFast3_3_partial.csv'
 
 
 def check_frame_id_decrements(data):
@@ -106,8 +109,8 @@ plt.plot(sdr_frame_id, sdr_mnTracked, label=csv_2.split('slam_stats_')[1], color
 # Add labels, title, and legend
 plt.xlabel("Frame ID")
 plt.ylabel("mnTracked")
-plt.xlim(600, 750)
-plt.ylim(0,600)
+plt.xlim(710, 750)
+plt.ylim(0,200)
 plt.title("mnTracked Trends for PQ and SDR (Subsampled)")
 plt.legend()
 plt.grid()
