@@ -33,10 +33,10 @@ print(gps_time[index],gps_x[index],gps_y[index])
 
 import re
 
-# slam_file_path = 'KeyFrameTrajectory_sdr_V2_timeCorrected.txt'
+slam_file_path = 'KeyFrameTrajectory_sdr_V2_timeCorrected.txt'
 # slam_file_path = 'KeyFrameTrajectory_pq_V2_ThFast3_3.txt'
 # slam_file_path = 'KeyFrameTrajectory_hdr_log_V4_ThFast3_3_complete.txt'
-slam_file_path = 'KeyFrameTrajectory_sdr_log_V3_ThFast3_3_complete.txt'
+# slam_file_path = 'KeyFrameTrajectory_sdr_log_V3_ThFast3_3_complete.txt'
 
 match = re.search(r'KeyFrameTrajectory_(.*?)_V', slam_file_path)
 if match:
@@ -72,6 +72,13 @@ gps_y = filtered_gps_y
 gps_time = filtered_gps_time
 
 print('\nlength of filtered gps data:', len(gps_time))
+
+gps_x = np.array(gps_x)
+gps_y = np.array(gps_y)
+coords = np.column_stack((gps_x, gps_y))
+
+dists = np.linalg.norm(coords[:, None] - coords, axis=2)
+print('max distance in GPS map',np.max(dists),'\n')
 
 
 # Function to find the closest SLAM time index for a given GPS time
@@ -171,6 +178,8 @@ aligned_slam_x, aligned_slam_y = aligned_slam_points[:, 0], aligned_slam_points[
 print("Horn's Method Transformation Matrix:")
 print(transformation_matrix)
 
+print('\nExperiment:\n,', experiment_name,'\n')
+
 # Plot the aligned trajectories
 
 def calculate_ate(gps_x, gps_y, aligned_slam_x, aligned_slam_y):
@@ -204,7 +213,7 @@ errors, rmse = calculate_ate(gps_x, gps_y, aligned_slam_x, aligned_slam_y)
 
 # Print the results
 # print("Absolute Trajectory Error (ATE) at each step:", errors)
-print("Root Mean Squared Error (RMSE):", rmse)
+print("Root Mean Squared Error (RMSE) Translational:", rmse)
 
 def plot_list(data, title='List Plot', xlabel='Index', ylabel='Value', experiment_name=""):
     plt.figure(figsize=(4.5, 4.5))
@@ -221,18 +230,19 @@ def plot_list(data, title='List Plot', xlabel='Index', ylabel='Value', experimen
         plt.savefig(f'{title}.pdf')
     plt.show()
 
-plot_2d_trajectory(gps_x, gps_y, title1='GPS', x2=aligned_slam_x, y2=aligned_slam_y, title2='SLAM', experiment_name=experiment_name)
 
-plot_list(errors, title=f'Absolute trajectory error ({experiment_name})', xlabel='Time (s)', ylabel='Absolute trajectory error (m)')
 
 
 
 
 import numpy as np
 
+import numpy as np
+
 def compute_rpe_rmse(gt_x, gt_y, data_x, data_y):
     """
     Compute RPE and RMSE of RPE from 2D ground truth and estimated trajectories.
+    Also computes average error, average relative motion of GT, and average percent error.
     
     Inputs:
         gt_x, gt_y   -- ground truth coordinates
@@ -241,6 +251,9 @@ def compute_rpe_rmse(gt_x, gt_y, data_x, data_y):
     Returns:
         rpe_list     -- list of relative pose errors
         rmse_rpe     -- RMSE of relative pose errors
+        avg_error    -- average error
+        avg_gt_motion -- average relative motion of GT
+        avg_percent_error -- average percent error
     """
     # Convert inputs to numpy arrays
     gt_x, gt_y = np.array(gt_x), np.array(gt_y)
@@ -250,6 +263,7 @@ def compute_rpe_rmse(gt_x, gt_y, data_x, data_y):
     N = len(gt_x)
 
     rpe_list = []
+    gt_motions = []
 
     for i in range(N - 1):
         # Compute relative motion from i to i+1 for GT and estimate
@@ -263,15 +277,41 @@ def compute_rpe_rmse(gt_x, gt_y, data_x, data_y):
         error = np.sqrt((gt_dx - data_dx)**2 + (gt_dy - data_dy)**2)
         rpe_list.append(error)
 
+        # Store the relative motion of ground truth
+        gt_motions.append(np.sqrt(gt_dx**2 + gt_dy**2))
+
+    # Compute RMSE of RPE
+    rmse_rpe = np.sqrt(np.mean(np.array(rpe_list)**2))
+
+    # Compute average error
+    avg_error = np.mean(rpe_list)
+
+    # Compute average relative motion of GT
+    avg_gt_motion = np.mean(gt_motions)
+
+    # Compute average percent error (error / avg GT motion)
+    avg_percent_error = np.mean(np.array(rpe_list) / np.array(gt_motions)) * 100
+
+    return rpe_list, rmse_rpe, avg_error, avg_gt_motion, avg_percent_error
+
     # RMSE of RPE
     rpe_array = np.array(rpe_list)
     rmse_rpe = np.sqrt(np.mean(rpe_array**2))
 
     return rpe_list, rmse_rpe
 
-rpe_list, rmse_rpe = compute_rpe_rmse(gps_x, gps_y, aligned_slam_x, aligned_slam_y)
+rpe_list, rmse_rpe, avg_error, avg_gt_motion, avg_percent_error = compute_rpe_rmse(gps_x, gps_y, aligned_slam_x, aligned_slam_y)
 # print("Relative Pose Error (RPE) at each step:", rpe_list)
 print("Root Mean Squared Error (RMSE) of RPE:", rmse_rpe)
 
+print("\nAverage Error RPE error:", avg_error,'\n')
+print("Average Relative Motion of GT:", avg_gt_motion)
+print("Average Percent Error:", avg_percent_error)
 # Plot RPE
+
+
+
+plot_2d_trajectory(gps_x, gps_y, title1='GPS', x2=aligned_slam_x, y2=aligned_slam_y, title2='SLAM', experiment_name=experiment_name)
+
+plot_list(errors, title=f'Absolute trajectory error ({experiment_name})', xlabel='Time (s)', ylabel='Absolute trajectory error (m)')
 plot_list(rpe_list, title=f'Relative Pose Error ({experiment_name})', xlabel='Index', ylabel='Relative Pose Error (m)')
