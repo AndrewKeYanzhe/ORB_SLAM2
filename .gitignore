@@ -36,3 +36,10 @@ mnTracked_trends_subsampled.pdf
 *.pyc
 .DS_Store
 3d_plot_slam.pdf
+feature_point_matches_hdr-log.pdf
+2d_plot_slam_hdr_pq.pdf
+2d_plot_slam_hdr_log.pdf
+2d_plot_slam_sdr_log.pdf
+2d_plot_slam_sdr.pdf
+Absolute trajectory error (sdr).pdf
+Relative Pose Error (sdr).pdf

@@ -84,9 +84,9 @@ def plot_2d_trajectory(x,y, title1 = None, x2=None, y2=None, title2=None, experi
 if __name__ == "__main__":
     # Example usage
 
-    # trajectory_path = "KeyFrameTrajectory_sdr_4000orb.txt"
+    trajectory_path = "KeyFrameTrajectory_sdr_V2_timeCorrected.txt"
     # trajectory_path = "KeyFrameTrajectory_pq_4000orb.txt"
-    trajectory_path = "KeyFrameTrajectory_hdr_log_V4_ThFast3_3_complete.txt"
+    # trajectory_path = "KeyFrameTrajectory_hdr_log_V4_ThFast3_3_complete.txt"
 
     plot_3d_trajectory(trajectory_path)
 
