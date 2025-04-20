@@ -35,3 +35,4 @@ mnTracked_trends_subsampled.pdf
 
 *.pyc
 .DS_Store
+3d_plot_slam.pdf
