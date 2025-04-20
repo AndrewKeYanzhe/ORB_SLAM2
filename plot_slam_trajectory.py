@@ -15,7 +15,7 @@ def read_slam_trajectory(file_path):
 
 def plot_3d_trajectory(file_path):
     """Plots the 3D trajectory using x, y, z coordinates."""
-    _, x, y, z = read_slam_trajectory(file_path)
+    _, x, z, y = read_slam_trajectory(file_path)
     
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
@@ -32,6 +32,7 @@ def plot_3d_trajectory(file_path):
     ax.set_title("3D SLAM Trajectory")
     # ax.legend()
     # plt.show()
+    plt.axis("equal")  # Ensure equal scaling
     plt.savefig('3d_plot_slam.pdf')
 
 def plot_2d_trajectory(x,y, title1 = None, x2=None, y2=None, title2=None, experiment_name=""):
@@ -87,7 +88,9 @@ if __name__ == "__main__":
     # trajectory_path = "KeyFrameTrajectory_pq_4000orb.txt"
     trajectory_path = "KeyFrameTrajectory_hdr_log_V4_ThFast3_3_complete.txt"
 
-    # plot_3d_trajectory(trajectory_path)
+    plot_3d_trajectory(trajectory_path)
 
-    _, x, y, _ = read_slam_trajectory(trajectory_path)
+    #  time, x, z , y . this is camera coordinates, y is depth
+    # x, z is image plane
+    _, x, _ , y = read_slam_trajectory(trajectory_path)
     plot_2d_trajectory(x,y)

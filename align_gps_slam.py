@@ -34,7 +34,7 @@ print(gps_time[index],gps_x[index],gps_y[index])
 import re
 
 slam_file_path = 'KeyFrameTrajectory_sdr_V2_timeCorrected.txt'
-# slam_file_path = 'KeyFrameTrajectory_pq_V2_ThFast3_3.txt'
+# slam_file_path = 'KeyFrameTrajectory_hdr_pq_V2_ThFast3_3.txt'
 # slam_file_path = 'KeyFrameTrajectory_hdr_log_V4_ThFast3_3_complete.txt'
 # slam_file_path = 'KeyFrameTrajectory_sdr_log_V3_ThFast3_3_complete.txt'
 
@@ -45,7 +45,9 @@ if match:
 
 
 # about 3 keyframes per second
-slam_time, slam_x_og, slam_y_og, slam_z_og = read_slam_trajectory(slam_file_path)
+#  time, x, z , y . this is camera coordinates, y is depth along optical axis
+# x, z is image plane
+slam_time, slam_x_og, slam_z_og, slam_y_og = read_slam_trajectory(slam_file_path)
 
 print('\ntest slam data')
 print(slam_time[index],slam_x_og[index],slam_y_og[index],slam_z_og[index])
