@@ -34,3 +34,4 @@ mnTracked_trends_subsampled.pdf
 
 
 *.pyc
+.DS_Store
